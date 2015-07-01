@@ -33,6 +33,27 @@ class Grid(QtGui.QWidget):
 
         return self.addItem(label, comboBox, height=height, width=width)
 
+    def addCheckBox(self, label, state=False, height=1, width=1):
+        checkbox = QtGui.QCheckBox()
+
+        if isinstance(state, bool):
+            if state is False:
+                setState = QtCore.Qt.Unchecked
+            else:
+                setState = QtCore.Qt.Checked
+        elif isinstance(state, int):
+            if state is 0:
+                setState = QtCore.Qt.Unchecked
+            else:
+                setState = QtCore.Qt.Checked
+        elif isinstance(state, QtCore.Qt.CheckState):
+                setState = state
+        else:
+            setState = QtCore.Qt.Unchecked
+
+        checkbox.setCheckState(setState)
+        return self.addItem(label, checkbox, height=height, width=width)
+
     def addTable(self, label, rows=None, cols=None, data=None, height=1, width=1, selectionMode=QtGui.QAbstractItemView.SingleSelection ):
         if rows is not None and cols is not None:
             table = ATableWidget(rows, cols)

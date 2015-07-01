@@ -11,7 +11,7 @@ class Example(vizta_core.Grid):
         titleEdit = QtGui.QLineEdit()
         authorEdit = QtGui.QLineEdit()
         reviewEdit = QtGui.QTextEdit()
-        table = QtGui.QTableWidget()
+        checkbox = QtGui.QCheckBox()
 
         data = { "Alex": { "a": 1, "b": 2, "c": 3, }, "Tom": { "a": 1, "b": 2, "c": 3, "d": 4, "e": 5, "f": 6, }, "Mike": { "a": 1, "b": 2, }, }
 
@@ -19,6 +19,8 @@ class Example(vizta_core.Grid):
         self.addComboBox("Box", ["Hi", "Two", "3", "Fore"], index=411 )
         self.addItem("Author", authorEdit)
         self.addItem("Review", reviewEdit, height=5)
+        self.addItem("Options", checkbox)
+        self.addCheckBox("Options2", state=1)
 
         # Adding a table with the "Raw" format for data, meaning it is not in a ViztaTableData format
         # Since it is a dict, you cant always count on the data being in the right order.
