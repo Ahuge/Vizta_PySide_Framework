@@ -3,6 +3,7 @@ __author__ = 'Alex'
 from PySide import QtGui, QtCore
 import sys
 import vizta_core
+from vizta_core import ViztaTableWidget
 
 class Example(vizta_core.Grid):
 
@@ -18,7 +19,7 @@ class Example(vizta_core.Grid):
         self.addItem("Title", titleEdit)
         self.addComboBox("Box", ["Hi", "Two", "3", "Fore"], index=411 )
         self.addItem("Author", authorEdit)
-        self.addItem("Review", reviewEdit, height=5)
+        self.addItem("Review", reviewEdit)
         self.addItem("Options", checkbox)
         self.addCheckBox("Options2", state=1)
 
@@ -36,10 +37,10 @@ class Example(vizta_core.Grid):
                 },
             }
 
-        self.addTable("Table", data=data, height=6)
+        self.addTable("Table", data=data)
 
         # Constructing a Table without any data, then adding it with setData
-        myTable = self.addTable("My Table", rows=3, cols=6, height=5)
+        myTable = self.addTable("My Table", rows=3, cols=6)
         myTable[1].setData(data, clear=True)
 
 
@@ -50,10 +51,14 @@ class Example(vizta_core.Grid):
                                   [ ["one", "two"], ["one", "two", "three"], ["one", "two", "three", "four", "five", "six"], ]
                                   )
 
-        self.addTable("ViztaTable", data=datagen, height=6)
-        viztaTable = self.widgetDict["ViztaTable"]["widgets"][1]
+        self.addTable("ViztaTable", data=datagen)
+        viztaTable = self.widgetDict["ViztaTable"][1]
         newCell = QtGui.QTableWidgetItem( "TEST" )
-        viztaTable.setItem( "Mike", "f", newCell)
+        viztaTable.setTableItem( "Mike", "f", newCell)
+
+
+        testTable = self.addTable("TestTable")
+
 
         self.setGeometry(300, 300, 705, 400)
 

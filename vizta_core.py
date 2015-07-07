@@ -18,7 +18,7 @@ class Grid(QtGui.QWidget):
         self.grid.setSpacing(10)
         self.setLayout(self.grid)
 
-    def addComboBox(self, label, options, userdata=[], index=0, height=1, width=1 ):
+    def addComboBox(self, label, options, userdata=[], index=0 ):
 
         comboBox = QtGui.QComboBox()
         for item, data in izip_longest(options, userdata):
@@ -31,9 +31,9 @@ class Grid(QtGui.QWidget):
 
         comboBox.setCurrentIndex(startIndex)
 
-        return self.addItem(label, comboBox, height=height, width=width)
+        return self.addItem(label, comboBox)
 
-    def addCheckBox(self, label, state=False, height=1, width=1):
+    def addCheckBox(self, label, state=False):
         checkbox = QtGui.QCheckBox()
 
         if isinstance(state, bool):
@@ -52,16 +52,11 @@ class Grid(QtGui.QWidget):
             setState = QtCore.Qt.Unchecked
 
         checkbox.setCheckState(setState)
-        return self.addItem(label, checkbox, height=height, width=width)
+        return self.addItem(label, checkbox)
 
-    def addTable(self, label, rows=None, cols=None, data=None, height=1, width=1, selectionMode=QtGui.QAbstractItemView.SingleSelection ):
-        if rows is not None and cols is not None:
-            table = ATableWidget(rows, cols)
-        elif data is not None:
-            rows, cols = self._getTableData( data )
-            table = ATableWidget(rows, cols)
-        else:
-            table = ATableWidget(rows, cols)
+    def addTable(self, label, rows=None, cols=None, data=None, selectionMode=QtGui.QAbstractItemView.SingleSelection ):
+        table = ViztaTableWidget(data, rows, cols)
+
 
         if data is not None:
             if isinstance(data, ViztaTableData):
@@ -72,30 +67,23 @@ class Grid(QtGui.QWidget):
                 table.setRawData(data, clear=True)
 
         table.setSelectionMode( selectionMode )
-        return self.addItem(label, table, height=height, width=width)
+        return self.addItem(label, table)
 
-    def addItem(self, label, item, height=1, width=1 ):
+    def addItem(self, label, item):
         labelItem = QtGui.QLabel(label)
         item = item
 
         listHeight = self.getHeight()
 
         self.grid.addWidget(labelItem  , listHeight+1, 0, 1        , 1)
-        self.grid.addWidget(item        , listHeight+1, 1, height   , width)
+        self.grid.addWidget(item        , listHeight+1, 1, 1   , 1)
 
-        self.widgetDict[label] = {
-            "height": height,
-            "width": width,
-            "widgets": [labelItem, item]
-        }
+        self.widgetDict[label] = [labelItem, item]
 
         return (labelItem, item)
 
     def getHeight(self):
-        totalHeight = 0
-        for x in self.widgetDict:
-            totalHeight += self.widgetDict[x]["height"]
-        return totalHeight
+        return self.grid.rowCount()
 
     def _getTableData( self, data ):
         if not isinstance(data, ViztaTableData):
@@ -116,7 +104,32 @@ class Grid(QtGui.QWidget):
         return rows, cols
 
 
-class ATableWidget(QtGui.QTableWidget):
+class ViztaTableWidget(QtGui.QTableWidget):
+
+    def __init__(self, tableData=None, rows=None, columns=None):
+        if (rows is None or columns is None) and tableData is not None:
+            rows, columns = self._getTableData( tableData )
+        super(ViztaTableWidget, self).__init__(rows, columns)
+        if tableData is not None:
+            self.setData(tableData)
+
+    def _getTableData(self, tableData):
+        if not isinstance(tableData, ViztaTableData):
+            return self._getRawTableData(tableData)
+
+        rows = len(tableData["HEADER"]["ROWS"])
+        cols = len(tableData["HEADER"]["COLUMNS"])
+        return rows, cols
+
+    def _getRawTableData( self, tableData ):
+
+        rows = 0
+        cols = 0
+        for row, col in tableData.iteritems():
+            rows += 1
+            if len(col) > cols:
+                cols = len(col)
+        return rows, cols
 
     def setRawData(self, data, clear=True):
         if clear:
@@ -163,10 +176,10 @@ class ATableWidget(QtGui.QTableWidget):
             rowNum += 1
         return True
 
-    def setItem(self, rowName, columnName, item):
+    def setTableItem(self, rowName, columnName, item):
 
         if isinstance(rowName, int) and isinstance(columnName, int):
-            return super(ATableWidget, self).setItem(rowName, columnName, item)
+            return super(ViztaTableWidget, self).setItem(rowName, columnName, item)
 
         colIndex = None
         rowIndex = None
@@ -180,7 +193,7 @@ class ATableWidget(QtGui.QTableWidget):
                 rowIndex = x
 
         if colIndex is not None and rowIndex is not None:
-            return super(ATableWidget, self).setItem(rowIndex, colIndex, item)
+            return super(ViztaTableWidget, self).setItem(rowIndex, colIndex, item)
 
         if rowIndex is None:
             raise ValueError("Your row header name was not found.")
